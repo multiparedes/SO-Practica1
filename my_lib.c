@@ -42,8 +42,6 @@ char *my_strcpy(char *dest, const char *src) {
     return dest;
 }
 
-/*FUNCIONA PERUANAMENT - ARREGLAR LONGITUDS*/
-
 char *my_strncpy(char *dest, const char *src, size_t n) {
 
     for(int longitud = 0; longitud < n; longitud++) {
@@ -53,25 +51,19 @@ char *my_strncpy(char *dest, const char *src, size_t n) {
     return dest;
 }
 
-/*FALLA*/
-
 char *my_strcat(char *dest, const char *src){
 
     int lendest = my_strlen(dest);
     int lensrc = my_strlen(src);
     int lentotal = lendest + lensrc + 1;
 
-    char *aux = malloc(lentotal * sizeof(char));
-
-    my_strcpy(aux, dest);
-
     for (int i = 0; i < lensrc; ++i) {
-        *(aux + lendest + i) = *(src + i);
+        *(dest + lendest + i) = *(src + i);
     }
 
-    *(aux + lentotal - 1) = '\0';
+    *(dest + lentotal - 1) = '\0';
 
-   return aux;
+   return dest;
 }
 
 char *my_strchr(const char *str, int c){
@@ -85,5 +77,6 @@ char *my_strchr(const char *str, int c){
             longitud++;
         }
     }
+    
     return  NULL;
 }   

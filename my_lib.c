@@ -47,7 +47,7 @@ char *my_strncpy(char *dest, const char *src, size_t n) {
     for(int longitud = 0; longitud < n; longitud++) {
         *(dest + longitud) = *(src + longitud);
     }
-    
+
     return dest;
 }
 
@@ -79,14 +79,14 @@ char *my_strchr(const char *str, int c){
     }
 
     return  NULL;
-}   
+}
 
 struct my_stack *my_stack_init(int size) {
 
     struct my_stack *p_my_stack;
     p_my_stack = malloc(sizeof(struct my_stack));
 
-    p_my_stack->size = size; 
+    p_my_stack->size = size;
     p_my_stack->top = NULL;
 
     return p_my_stack;
@@ -101,7 +101,7 @@ int my_stack_push(struct my_stack *stack, void *data) {
         struct my_stack_node *nuevo_nodo;
         nuevo_nodo = malloc(sizeof(struct my_stack_node));
 
-        nuevo_nodo->data = data;    
+        nuevo_nodo->data = data;
         nuevo_nodo->next = stack->top;
 
         stack->top = nuevo_nodo;
@@ -114,12 +114,12 @@ void *my_stack_pop (struct my_stack *stack){
         struct my_stack_node *eliminado = stack->top;
         stack->top = stack->top->next;
 
-        struct my_data *ret = eliminado->data;  
+        struct my_data *ret = eliminado->data;
 
         free(eliminado);
-        return ret; 
+        return ret;
     }
-    else {return NULL;}   
+    else {return NULL;}
 }
 
 int my_stack_len (struct my_stack *stack){
@@ -139,14 +139,74 @@ int my_stack_len (struct my_stack *stack){
 
 int my_stack_purge (struct my_stack *stack){
     int liberados = 0;
+
     while (stack->top){
         void *data = my_stack_pop(stack);
-        liberados = liberados+ sizeof(struct my_stack_node) + stack->size;
-        free(data);        
+        liberados = liberados + sizeof(struct my_stack_node) + stack->size;
+        free(data);
     }
 
     free(stack);
     liberados = liberados + sizeof(struct my_stack);
 
     return liberados;
+}
+
+struct my_stack_node *my_stack_seek(struct my_stack *stack, int pos) {
+
+    struct my_stack_node *ret = stack->top;
+
+    for(int i = 0; i < pos; i++) {
+        ret = ret->next;
+    }
+
+    return ret;
+}
+
+int my_stack_write(struct my_stack *stack, char *filename) {
+
+    int contador = 0;
+    struct my_stack *pila_aux = my_stack_init(stack->size);
+
+    for(int num_node = 0; num_node < my_stack_len(stack); num_node++) {
+        my_stack_push(pila_aux,my_stack_seek(stack,num_node)->data);
+    }
+
+    int file = open(filename,O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+
+    if(file != -1) {
+
+        int wr = write(file, &(stack->size), sizeof(int));
+        if(wr == -1) {
+            close(file);
+            perror("ERROR: ");
+            return -1;
+        }
+
+        struct my_stack_node *node_aux = my_stack_pop(pila_aux);
+
+        while(node_aux != NULL) {
+            wr = write(file, &(node_aux->data), pila_aux->size);
+            if(wr == -1){
+                close(file);
+                perror("ERROR: ");
+                return -1;
+            }
+            node_aux = my_stack_pop(pila_aux);
+            contador++;
+        }
+
+        close(file);
+
+    } else {
+        perror("ERROR: ");
+        return -1;
+    }
+
+    return contador;
+}
+
+
+struct my_stack *my_stack_read(char *filename) {
+
 }

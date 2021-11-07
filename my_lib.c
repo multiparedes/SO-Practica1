@@ -257,8 +257,8 @@ struct my_stack *my_stack_read(char *filename) {
         }
 
         stack = my_stack_init(val_size);
-            
-        wr = read(file,&val_data,stack->size);
+        val_data = malloc(val_size);
+        wr = read(file,val_data,stack->size);
 
         if(wr == -1) {
             close(file);
@@ -267,15 +267,16 @@ struct my_stack *my_stack_read(char *filename) {
         }
 
         while(wr > 0) {
-            struct my_stack_node *nuevo_nodo;
-            nuevo_nodo = malloc(sizeof(struct my_stack_node));
+            my_stack_push(stack,val_data);
 
-            nuevo_nodo->data = val_data;
-            nuevo_nodo->next = stack->top;
-
-            stack->top = nuevo_nodo;
+            val_data = malloc(val_size);
+            wr = read(file,val_data,stack->size);
             
-            wr = read(file,&val_data,val_size);
+            if(wr == -1) {
+                close(file);
+                perror("ERROR");
+                return NULL;
+            }
         }
 
     } else {
